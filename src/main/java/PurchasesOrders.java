@@ -1,3 +1,4 @@
+import java.util.Properties;
 
 public class PurchasesOrders {
 
@@ -5,6 +6,10 @@ public class PurchasesOrders {
     private String consume_topic = "DBInfo_topic";
 
     public static void main(String[] args) throws Exception {
+        Properties props = Utilities.consumerAndProducer();
+
+
+
 
     }
 }
