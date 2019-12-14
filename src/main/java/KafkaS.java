@@ -7,6 +7,7 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
+import org.apache.kafka.streams.kstream.Produced;
 
 
 public class KafkaS {
@@ -14,12 +15,12 @@ public class KafkaS {
     public static void main(String[] args) throws InterruptedException, IOException {
 
         //Kafka Streams reads from Sales Topic
-        String topicName = args[0].toString();
-        String outtopicname = "resultstopic";
+        String topicName = args[0].toString();   //Sales_topic
 
         //Kafka Streams reads from Purchases Topic
-        String secondtopicName = args[0].toString();
-        String outsecondtopicname = "purchasestopic";
+        String secondtopicName = args[0].toString(); //Purchases_topic
+
+        String outtopicname = "results_topic";
 
 
         java.util.Properties props = new Properties();
@@ -34,31 +35,28 @@ public class KafkaS {
         KStream<String, Long> lines = builder.stream(topicName);
 
 
-        KTable<String, Long> outlines = lines.
-                groupByKey().count();
-        outlines.toStream().to(outtopicname);
+        KTable<String, Long> outlines = lines.groupByKey().count();
+        outlines.mapValues(v -> "" + v).toStream().to(outtopicname, Produced.with(Serdes.String(), Serdes.String()));
+
 
         //Purchases Topic
         StreamsBuilder secondbuilder = new StreamsBuilder();
         KStream<String, Long> secondlines = builder.stream(secondtopicName);
 
 
-        KTable<String, Long> secondoutlines = lines.
-                groupByKey().count();
-        outlines.toStream().to(outsecondtopicname);
-
+        KTable<String, Long> secondoutlines = secondlines.groupByKey().count();
+        secondoutlines.mapValues(v -> "" + v).toStream().to(outtopicname, Produced.with(Serdes.String(), Serdes.String()));
 
 
         KafkaStreams streams = new KafkaStreams(builder.build(), props);
         streams.start();
 
+        System.out.println("Kafka Streans reading stream from topic: " + topicName);
+
 
         KafkaStreams secondstreams = new KafkaStreams(secondbuilder.build(), props);
-
-        streams.start();
         secondstreams.start();
 
-        System.out.println("Kafka Stream reading stream from topic " + topicName);
         System.out.println("Kafka Stream reading stream from topic " + secondtopicName);
 
     }

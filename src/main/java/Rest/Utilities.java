@@ -1,3 +1,5 @@
+package Rest;
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
 import java.util.Properties;

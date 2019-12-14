@@ -1,3 +1,5 @@
+import Rest.Utilities;
+
 import java.util.Properties;
 
 public class PurchasesOrders {
